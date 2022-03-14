@@ -1,0 +1,48 @@
+pipeline{
+    agent any
+        tools {
+            maven 'maven3'
+        }
+        environment {
+            Docker_Tag = getVersion()
+        }
+        
+    stages{
+        stage("SCM"){
+            steps{
+                git credentialsId: 'github', url: 'https://github.com/SharanTech/my-app'
+            }
+        }
+        stage("Maven Build"){
+            steps{
+                sh "mvn clean package"
+                sh "mv target/myweb*.war target/myapp.war"
+            }
+        }
+        stage("Docker Build"){
+            steps{
+                sh "docker build . -t sharan95/myweb:${Docker_Tag}"
+            }
+        }
+        stage("Docker push"){
+            steps{
+                withCredentials([string(credentialsId: 'dockerPass', variable: 'dockerPassword')]) {
+                // some block
+                sh "docker login -u sharan95 -p ${dockerPassword}"
+            }
+                sh "docker push sharan95/myweb:${Docker_Tag}"
+            }
+        }
+        stage("Docker Deployment"){
+            steps{
+              ansiblePlaybook credentialsId: 'dev', disableHostKeyChecking: true, extras: "-e Docker_Tag=${Docker_Tag}", installation: 'ansible', inventory: 'dev.inv', playbook: 'DeployDocker.yml'
+            }
+            
+        }
+    } 
+}
+
+def getVersion(){
+   def CommitHash =  sh returnStdout: true, script: 'git rev-parse --short HEAD'
+   return CommitHash
+}
