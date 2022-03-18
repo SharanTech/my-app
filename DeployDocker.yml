@@ -22,7 +22,7 @@
     - name: Start the container
       docker_container:
         name: Firstapp
-        image: "sharan95/myweb:{{Docker_Tag}}"
+        image: "sharan95/newdock:{{Docker_Tag}}"
         state: started
         published_ports:
           - 0.0.0.0:8080:8080
