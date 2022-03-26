@@ -32,7 +32,7 @@ pipeline{
                 sh "docker push sharan95/newdock:${Docker_Tag}"
             }
         }
-        stage("Docker deploy"){
+        stage("Docker deploying"){
             steps{
                 ansiblePlaybook become: true, credentialsId: 'Test', disableHostKeyChecking: true, extras: "-e Docker_Tag=${Docker_Tag}", installation: 'ansible', inventory: 'dev.inv', playbook: 'DeployDocker.yml', 
                 vaultCredentialsId: 'dockerPass'
