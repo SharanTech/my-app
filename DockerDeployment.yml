@@ -19,7 +19,7 @@
       pip:
         name: docker-py
         state: present
-    - name: Starting the container
+    - name: Start the container
       docker_container:
         name: Firstapp
         image: "sharan95/newdock:{{Docker_Tag}}"
